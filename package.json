@@ -1,0 +1,28 @@
+{
+  "name": "flash-sale-engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karthikvishal-s/Flash-Sale-Engine.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/karthikvishal-s/Flash-Sale-Engine/issues"
+  },
+  "homepage": "https://github.com/karthikvishal-s/Flash-Sale-Engine#readme",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.948.0",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "redis": "^5.10.0"
+  }
+}
