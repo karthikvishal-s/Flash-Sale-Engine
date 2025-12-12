@@ -10,8 +10,14 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
 app.use(express.json());
 
+require('dotenv').config();
+const { SQSClient, SendMessageCommand } = require("@aws-sdk/client-sqs");
+
+const sqsClient = new SQSClient({ region: process.env.AWS_REGION });
 
 //this is my LuaScript
+
+
 
 const purchaseScript = `
     local stock = tonumber(redis.call('get',KEYS[1]))
@@ -43,7 +49,19 @@ app.post('/buy', async (req, res) => {
     });
     if (result==1){
         //sending AWS queue
-        res.status(200).send('Success: Secured item!');
+        const orderData = {
+            userId:'user_'+(Math.random() * 10000),
+            productId: 'iphone_17',
+            timestamp: new Data().toISOString()
+        }
+        const command = new SendMessageCommand({
+            QueueUrl: process.env.SQS_QUEUE_URL,
+            MessageBody:JSON.stringify(orderData),
+        });
+
+        await sqsClient.send(command);
+
+        res.status(200).send('Order Queued...');
         } else {
             res.status(400).send('Fail: Sold Out');
         }
