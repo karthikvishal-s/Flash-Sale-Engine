@@ -186,6 +186,7 @@ Should be **0**.
 ## 👨‍💻 Author
 
 **Karthik Vishal**
+
 Built to demonstrate **Distributed Systems engineering** for high-scale, high-performance applications.
 
 ---
