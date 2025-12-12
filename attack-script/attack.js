@@ -1,9 +1,7 @@
 // attack-script/attack.js
 const axios = require('axios');
 
-const PORT = 3005;
-
-const URL = `http://localhost:${PORT}/buy`;
+const URL = 'http://localhost:3003/buy';
 const REQUESTS = 200; // We have 100 items, but we send 200 requests
 
 async function attack() {
