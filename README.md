@@ -88,10 +88,13 @@ The system was stress-tested with JMeter to validate performance under load.
 
 > Stable, no major spikes — Redis gatekeeper handled load smoothly.
 
+![Response Graph](./assets/graph_race.png)
+
+
 ### 2. Summary Report
 
 > Exactly 100 successful orders + 900 correct rejections → **atomicity validated**.
-
+![JMeter Summary](./assets/table_race.png)
 ---
 
 ## 🛠 Tech Stack
