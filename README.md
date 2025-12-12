@@ -95,7 +95,7 @@ The system was stress-tested with JMeter to validate performance under load.
 
 ### 2. Summary Report
 
-> Exactly 100 successful orders + 900 correct rejections → **atomicity validated**.
+> Exactly 10 successful orders + 82000+ correct rejections → **atomicity validated**.
 ![JMeter Summary](./assets/table_race.png)
 ---
 
