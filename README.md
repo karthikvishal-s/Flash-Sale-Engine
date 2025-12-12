@@ -45,7 +45,7 @@ graph LR
 * Safely commits orders to the database.
 * Allows horizontal scaling independent of the API.
 
-#### **4️⃣ JMeter **
+#### **4️⃣ JMeter**
 
 **Apache JMeter** was leveraged not only for benchmarking but also as the primary **debugging tool** to isolate bottlenecks and rigorously validate the atomicity of the Redis Lua scripts under extreme load conditions.
 
