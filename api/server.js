@@ -51,8 +51,8 @@ app.post('/buy', async (req, res) => {
         //sending AWS queue
         const orderData = {
             userId:'user_'+(Math.random() * 10000),
-            productId: 'iphone_17',
-            timestamp: new Data().toISOString()
+            productId: 'iphone_16',
+            timestamp: new Date().toISOString()
         }
         const command = new SendMessageCommand({
             QueueUrl: process.env.SQS_QUEUE_URL,
