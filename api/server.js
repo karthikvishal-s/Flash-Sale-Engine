@@ -1,8 +1,20 @@
 // api/server.js
 const express = require('express');
 const { createClient } = require('redis');
+import cors from 'cors';
+// ... (existing imports)
+
 const app = express();
-const port = 3003;
+const port = 3003; 
+
+// --- NEW CODE START ---
+// 1. Configure CORS options
+const corsOptions = {
+    origin: 'http://localhost:5005', // Only allow requests from your Next.js frontend
+    methods: 'GET,POST', // Only allow these specific methods
+};
+app.use(cors(corsOptions)); // 2. Apply the CORS middleware
+// --- NEW CODE END ---
 
 // Connect to Redis
 const client = createClient();
@@ -37,6 +49,19 @@ app.post('/reset', async (req, res) => {
 });
 
 // The Corrected "Buy" Endpoint
+
+// Endpoint to read the current stock count from Redis
+app.get('/stock', async (req, res) => {
+    try {
+        const stock = await client.get('iphone_stock');
+        // If stock is null (not initialized), default to 0
+        const count = stock !== null ? parseInt(stock) : 0; 
+        res.status(200).json({ stock: count });
+    } catch (e) {
+        console.error("Stock Read Error:", e);
+        res.status(500).json({ error: 'Failed to read stock' });
+    }
+});
 
 app.post('/buy', async (req, res) => {
     try{
