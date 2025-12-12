@@ -1,5 +1,3 @@
-# Flash-Sale-Engine
----
 
 # ⚡ High-Concurrency Flash Sale Engine
 
@@ -46,6 +44,10 @@ graph LR
 * A background worker consumes the queue.
 * Safely commits orders to the database.
 * Allows horizontal scaling independent of the API.
+
+#### **4️⃣ JMeter **
+
+**Apache JMeter** was leveraged not only for benchmarking but also as the primary **debugging tool** to isolate bottlenecks and rigorously validate the atomicity of the Redis Lua scripts under extreme load conditions.
 
 ---
 
