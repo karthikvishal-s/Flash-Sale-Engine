@@ -10,29 +10,51 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 
 app.use(express.json());
 
+
+//this is my LuaScript
+
+const purchaseScript = `
+    local stock = tonumber(redis.call('get',KEYS[1]))
+    if stock > 0 then
+        redis.call('decr',KEYS[1])
+        return 1
+    else
+        return 0
+    end    
+`;
+
+
 // Initialize Stock (Reset to 100 items)
 app.post('/reset', async (req, res) => {
     await client.set('iphone_stock', 100);
     res.send('Stock reset to 100');
 });
 
-// The BROKEN "Buy" Endpoint
+// The Corrected "Buy" Endpoint
+
 app.post('/buy', async (req, res) => {
-    // Step 1: Check Stock
-    const stock = parseInt(await client.get('iphone_stock'));
+    try{
+
+    //executing LuaScript atomically
+
+    const result =  await client.eval(purchaseScript,{
+        keys:['iphone_stock'],
+        arguments:[]
+    });
+    if (result==1){
+        //sending AWS queue
+        res.status(200).send('Success: Secured item!');
+        } else {
+            res.status(400).send('Fail: Sold Out');
+        }
     
-    if (stock > 0) {
-        // SIMULATED DELAY: This 50ms pause mimics real-world database latency
-        // This makes the race condition obvious.
-        await new Promise(r => setTimeout(r, 50)); 
-        
-        // Step 2: Decrease Stock
-        await client.decr('iphone_stock');
-        res.status(200).send('Success: Bought 1 iPhone');
-    } else {
-        res.status(400).send('Fail: Out of stock');
-    }
-});
+
+}catch(e){
+    console.error(e);
+    res.status(500).send('Server Error');
+}}
+
+);
 
 const start = async () => {
     await client.connect();
