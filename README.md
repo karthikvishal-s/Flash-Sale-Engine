@@ -79,13 +79,6 @@ The system was stress-tested with JMeter to validate performance under load.
 
 ### **Results**
 
-| Metric         | Value        |
-| -------------- | ------------ |
-| Total Requests | 1,000        |
-| Stock Oversold | **0 (0%)**   |
-| Throughput     | ~500 req/sec |
-| Avg Latency    | < 15ms       |
-
 ### 1. Response Time Graph
 
 > Stable, no major spikes — Redis gatekeeper handled load smoothly.
