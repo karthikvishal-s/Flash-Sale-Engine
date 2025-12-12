@@ -1,3 +1,4 @@
+// client/src/app/StockCounter.js
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -12,12 +13,11 @@ const StockCounter = () => {
     const [status, setStatus] = useState('Loading...');
     const [loading, setLoading] = useState(false);
     
-    // Simulation State
-    const [loadSize, setLoadSize] = useState(1000);
+    // --- Simulation States ---
+    const [loadSize, setLoadSize] = useState(1000); // The number of buyers hitting the server
     const [isAttacking, setIsAttacking] = useState(false);
-    
-    // Fixed stock size for a noticeable effect during the attack simulation
-    const STOCK_SIZE_SIMULATION = 10; 
+    const [simulationStock, setSimulationStock] = useState(10); // The number of available items (The Winners)
+    // --- Simulation States ---
 
     // Function to fetch the current stock count from Redis
     const fetchStock = async () => {
@@ -37,16 +37,13 @@ const StockCounter = () => {
         if (stockCount <= 0 || loading) return;
         setLoading(true);
         
-        // Optimistic Update: Store current count before the async request
         const currentStock = stockCount; 
 
         try {
             const response = await axios.post(`${API_URL}/buy`, { userId: 'User_Manual' });
             
             alert(`Success: ${response.data}`);
-            
-            // Optimistically decrement UI immediately for responsiveness
-            setStockCount(currentStock - 1); 
+            setStockCount(currentStock - 1); // Optimistic Update
 
         } catch (error) {
             if (error.response && error.response.status === 400) {
@@ -56,30 +53,33 @@ const StockCounter = () => {
             }
         } finally {
             setLoading(false);
-            // Immediately sync with the server after a small delay
             setTimeout(fetchStock, 50); 
         }
     };
 
     // --- Core Function: Concurrency Load Attack ---
     const handleSimulateAttack = async () => {
-        if (isAttacking || isNaN(loadSize) || loadSize < 100 || loadSize > 5000) return;
+        // Validation check
+        if (isAttacking || isNaN(loadSize) || loadSize < 100 || loadSize > 5000 || isNaN(simulationStock) || simulationStock < 1) {
+            alert("Invalid input: Load must be 100-5000 and Stock must be >= 1.");
+            return;
+        }
 
         setIsAttacking(true);
         const requestsToSend = loadSize;
+        const stockToSet = simulationStock;
 
         console.log(`\n--- Starting Attack Simulation ---`);
-        console.log(`Resetting stock to ${STOCK_SIZE_SIMULATION}...`);
+        console.log(`Resetting stock to ${stockToSet} winners...`);
 
         try {
-            // 1. Reset the stock via the new API endpoint
-            await axios.post(`${API_URL}/reset-stock/${STOCK_SIZE_SIMULATION}`);
+            // 1. Reset the stock via the API, using the customizable stock size
+            await axios.post(`${API_URL}/reset-stock/${stockToSet}`);
             console.log(`Stock reset complete. Firing ${requestsToSend} requests...`);
             
-            // 2. Fire the concurrent requests (Promise.all simulates concurrency)
+            // 2. Fire the concurrent requests
             const requests = [];
             for (let i = 0; i < requestsToSend; i++) {
-                // User ID in the required range (100-5000)
                 const randomUserId = Math.floor(Math.random() * (5000 - 100 + 1)) + 100;
 
                 requests.push(
@@ -92,7 +92,7 @@ const StockCounter = () => {
             
             await Promise.all(requests);
             
-            alert(`Attack Complete! ${requestsToSend} requests sent. Check console/worker log.`);
+            alert(`Attack Complete! ${requestsToSend} requests sent. Exactly ${stockToSet} orders were queued.`);
 
         } catch (error) {
             alert(`Simulation failed: Ensure the API and Redis are running.`);
@@ -151,11 +151,23 @@ const StockCounter = () => {
             <div className="mt-8 pt-4 border-t border-gray-200">
                 <h3 className="text-xl font-semibold mb-3 text-gray-700">Load Simulation Tool</h3>
                 
+                {/* Custom Stock Input */}
+                <input
+                    type="number"
+                    value={simulationStock}
+                    onChange={(e) => setSimulationStock(parseInt(e.target.value))}
+                    placeholder="Available Stock (Winners)"
+                    min="1"
+                    className="w-full p-2 border border-gray-300 rounded-lg text-center mb-3 text-gray-800"
+                    disabled={isAttacking}
+                />
+                
+                {/* Custom Load Size Input */}
                 <input
                     type="number"
                     value={loadSize}
                     onChange={(e) => setLoadSize(parseInt(e.target.value))}
-                    placeholder="Load Size (100-5000)"
+                    placeholder="Load Size (100-5000 requests)"
                     min="100"
                     max="5000"
                     className="w-full p-2 border border-gray-300 rounded-lg text-center mb-3 text-gray-800"
@@ -164,7 +176,7 @@ const StockCounter = () => {
                 
                 <button 
                     onClick={handleSimulateAttack}
-                    disabled={isAttacking || isNaN(loadSize)}
+                    disabled={isAttacking || isNaN(loadSize) || isNaN(simulationStock)}
                     className={`
                         w-full py-2 text-sm font-semibold rounded-lg transition-colors
                         ${isAttacking 
@@ -176,13 +188,13 @@ const StockCounter = () => {
                 </button>
             </div>
             
-            {/* --- Admin Reset Button --- */}
+            {/* --- Admin Reset Button (Resets to the current stock setting) --- */}
             <button 
-                onClick={() => axios.post(`${API_URL}/reset-stock/10`).then(fetchStock)}
+                onClick={() => axios.post(`${API_URL}/reset-stock/${simulationStock}`).then(fetchStock)}
                 className="mt-4 px-3 py-1.5 text-xs bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
                 disabled={isAttacking}
             >
-                [Admin: Reset Stock to 10]
+                [Admin: Reset Stock to {simulationStock}]
             </button>
         </div>
     );

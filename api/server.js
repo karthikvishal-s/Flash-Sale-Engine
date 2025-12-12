@@ -10,9 +10,9 @@ const { SQSClient, SendMessageCommand } = require("@aws-sdk/client-sqs");
 const app = express();
 const port = 3003; 
 
-// --- 1. CORS Configuration ---
+// --- 1. CORS Configuration (Allows requests from the Next.js client) ---
 const corsOptions = {
-    // Client is on 3005
+    // CRITICAL: Ensure this matches your Next.js port (e.g., 3005)
     origin: 'http://localhost:5005', 
     methods: 'GET,POST', 
 };
@@ -22,6 +22,7 @@ app.use(express.json());
 
 // --- 2. AWS SQS and Redis Initialization ---
 
+// Initialize SQS Client with explicit credentials
 const sqsClient = new SQSClient({ 
     region: process.env.AWS_REGION,
     credentials: {
@@ -30,6 +31,7 @@ const sqsClient = new SQSClient({
     }
 });
 
+// Connect to Redis
 const client = createClient();
 client.on('error', (err) => console.log('Redis Client Error', err));
 
@@ -48,7 +50,7 @@ const purchaseScript = `
 
 // --- 4. API Endpoints ---
 
-// Dynamic Stock Reset Endpoint: POST /reset-stock/:count
+// Dynamic Stock Reset Endpoint: POST /reset-stock/:count (Used by both UI buttons)
 app.post('/reset-stock/:count', async (req, res) => {
     const count = parseInt(req.params.count);
     if (isNaN(count) || count < 1) {
@@ -58,7 +60,7 @@ app.post('/reset-stock/:count', async (req, res) => {
     res.send(`Stock reset to ${count}`);
 });
 
-// Stock Read Endpoint: GET /stock
+// Stock Read Endpoint: GET /stock (Used by the UI for polling)
 app.get('/stock', async (req, res) => {
     try {
         const stock = await client.get('iphone_stock');
@@ -73,14 +75,16 @@ app.get('/stock', async (req, res) => {
 // Buy Endpoint: POST /buy
 app.post('/buy', async (req, res) => {
     try {
+        // Execute LuaScript atomically
         const result =  await client.eval(purchaseScript, {
             keys: ['iphone_stock'],
             arguments: []
         });
 
         if (result == 1) {
+            // Success: Send order to AWS SQS Queue
             const orderData = {
-                // Ensure userId is read from the request body if available
+                // Reads User ID sent from the frontend
                 userId: req.body.userId || 'User_Manual', 
                 productId: 'iphone_16',
                 timestamp: new Date().toISOString()
@@ -95,6 +99,7 @@ app.post('/buy', async (req, res) => {
 
             res.status(200).send('Order Queued...');
         } else {
+            // Failure: Sold Out
             res.status(400).send('Fail: Sold Out');
         }
     } catch(e) {
