@@ -2,7 +2,7 @@
 const axios = require('axios');
 
 const URL = 'http://localhost:3003/buy';
-const REQUESTS = 200; // We have 100 items, but we send 200 requests
+const REQUESTS = 2000; // We have 10 items, but we send 2000 requests
 
 async function attack() {
     console.log(`Starting attack with ${REQUESTS} concurrent requests...`);

@@ -30,10 +30,10 @@ const purchaseScript = `
 `;
 
 
-// Initialize Stock (Reset to 100 items)
+// Initialize Stock (Reset to 10 items)
 app.post('/reset', async (req, res) => {
-    await client.set('iphone_stock', 100);
-    res.send('Stock reset to 100');
+    await client.set('iphone_stock', 10);
+    res.send('Stock reset to 10');
 });
 
 // The Corrected "Buy" Endpoint
