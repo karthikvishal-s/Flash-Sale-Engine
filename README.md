@@ -181,9 +181,8 @@ Run each component in a **separate terminal**:
 ## 👤 Author
 
 **Karthik Vishal**
+
 Built to demonstrate **distributed systems engineering**, **high-concurrency handling**, and **real-world backend scalability patterns**.
 
 ---
-
-⭐ If this project helped you understand high-scale system design, consider starring the repository!
-
+\
