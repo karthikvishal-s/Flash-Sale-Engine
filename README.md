@@ -61,14 +61,26 @@ The project includes a **Next.js frontend dashboard** that replaces traditional 
 
 ## Results
 
-### 1. Response Time Graph
+### 1. FrontPage
+
+> Before and after invoking the race condition
+![JMeter Summary](./assets/res1.png)
+![JMeter Summary](./assets/res2.png)
+
+
+### 2. Worker Terminal
+
+> Exactly 10 successful orders logged in worker terminal after dequeueing from AWS SQS.
+![JMeter Summary](./assets/terminal.png)
+
+### 3. Response Time Graph
 
 > Stable, no major spikes — Redis gatekeeper handled load smoothly.
 
 ![Response Graph](./assets/graph_race.png)
 
 
-### 2. Summary Report
+### 4. Summary Report
 
 > Exactly 10 successful orders + 82000+ correct rejections → **atomicity validated**.
 ![JMeter Summary](./assets/table_race.png)
