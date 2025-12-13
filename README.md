@@ -59,6 +59,22 @@ The project includes a **Next.js frontend dashboard** that replaces traditional 
 
 ---
 
+## Results
+
+### 1. Response Time Graph
+
+> Stable, no major spikes — Redis gatekeeper handled load smoothly.
+
+![Response Graph](./assets/graph_race.png)
+
+
+### 2. Summary Report
+
+> Exactly 10 successful orders + 82000+ correct rejections → **atomicity validated**.
+![JMeter Summary](./assets/table_race.png)
+---
+
+
 ## 🚀 Key Engineering Decisions
 
 * **Atomic Locking**
